@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, send_file, request, make_response
 from flask_cors import CORS
 import os
-import cv2
 from keras.models import load_model
 from keras_preprocessing.image import load_img, img_to_array
 import numpy as np
+from picamera import PiCamera
+import time
+
 
 app = Flask(__name__)
 CORS(app)
@@ -52,11 +54,12 @@ def getPrediction():
 @app.route('/startCapture', methods=['GET'])
 def startCapture():
     try:
-        #raspberry pi template to take pi camera input
-        # for cnt in range(1,11):
-        #     path = os.path.join(app.config['IMAGE_FOLDER'],str(cnt)+'.jpg')
-        #     img = '' ##image captured using cv2 in raspberry pi
-        #     cv2.imwrite(path, img)
+        for file in os.listdir(app.config['IMAGE_FOLDER']):
+            os.remove(os.path.join(app.config['IMAGE_FOLDER'],file))
+        camera = PiCamera()
+        for i in range(10):
+            time.sleep(2)
+            camera.capture(os.path.join(app.config['IMAGE_FOLDER'],str(i)+'.jpg'))
         return jsonify({
             'msg': 'ok'
         }), 200
